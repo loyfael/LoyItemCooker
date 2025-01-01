@@ -1,0 +1,13 @@
+name: CookerPlugin
+version: 1.0
+main: loyfael.Main
+api-version: 1.21
+commands:
+  furnace:
+    description: Open the cooker inventory.
+    permission: itemcooker.use
+    permission-message: Vous n'avez pas la permission d'utiliser cette commande.
+permissions:
+  itemcooker.use:
+    description: Allows the player to use the /furnace command.
+    default: op
