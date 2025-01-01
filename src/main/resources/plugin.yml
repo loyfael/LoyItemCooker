@@ -2,6 +2,7 @@ name: CookerPlugin
 version: 1.0
 main: loyfael.Main
 api-version: 1.21
+description: Conçu et codé par Loyfael. Plugin pour un /furnace.
 commands:
   furnace:
     description: Open the cooker inventory.
