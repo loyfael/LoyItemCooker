@@ -2,7 +2,6 @@ package loyfael;
 
 import loyfael.commands.FurnaceCommand;
 import loyfael.cooking.CookingManager;
-import loyfael.database.MySQLManager;
 import loyfael.listeners.InventoryListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -11,38 +10,36 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Objects;
 
 public class Main extends JavaPlugin implements Listener {
-    private static MySQLManager mysqlManager;
+
+  private static CookingManager cookingManager;
 
   @Override
-    public void onEnable() {
-        saveDefaultConfig();
+  public void onEnable() {
+    try {
+      // Vérification de LuckPerms
+      if (Bukkit.getPluginManager().getPlugin("LuckPerms") == null) {
+        getLogger().severe("LuckPerms n'est pas installé. Le plugin ne fonctionnera pas correctement.");
+        Bukkit.getPluginManager().disablePlugin(this);
+        return;
+      }
 
-        try {
-            // Initialisation des gestionnaires
-            mysqlManager = new MySQLManager(this);
-            mysqlManager.initializeDatabase();
+      // Initialisation du gestionnaire de cuisson
+      CookingManager cookingManager = new CookingManager();
 
-            CookingManager cookingManager = new CookingManager();
+      // Enregistrement des commandes et des événements
+      Objects.requireNonNull(getCommand("furnace")).setExecutor(new FurnaceCommand(cookingManager));
+      Bukkit.getPluginManager().registerEvents(new InventoryListener(cookingManager), this);
 
-            // Enregistrement des commandes et événements
-            Objects.requireNonNull(getCommand("furnace")).setExecutor(new FurnaceCommand(mysqlManager));
-            Bukkit.getPluginManager().registerEvents(new InventoryListener(cookingManager), this);
-
-            getLogger().info("[CookerPlugin] Plugin enabled successfully!");
-        } catch (Exception e) {
-            getLogger().severe("[CookerPlugin] Failed to enable: " + e.getMessage());
-        }
+      getLogger().info("[ItemCooker] Plugin enabled successfully!");
+    } catch (Exception e) {
+      getLogger().severe("[ItemCooker] Failed to enable: " + e.getMessage());
     }
+  }
 
-    @Override
-    public void onDisable() {
-        try {
-            if (mysqlManager != null) mysqlManager.closeConnection();
-            getLogger().info("[CookerPlugin] Plugin disabled!");
-        } catch (Exception e) {
-            getLogger().severe("[CookerPlugin] Failed to disable: " + e.getMessage());
-        }
-    }
+  @Override
+  public void onDisable() {
+    getLogger().info("[ItemCooker] Plugin disabled!");
+  }
 }
 
 

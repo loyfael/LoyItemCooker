@@ -1,4 +1,4 @@
-name: CookerPlugin
+name: ItemCooker
 version: 1.0
 main: loyfael.Main
 api-version: 1.21
