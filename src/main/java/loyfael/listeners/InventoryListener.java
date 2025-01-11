@@ -6,6 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryListener implements Listener {
@@ -21,22 +22,27 @@ public class InventoryListener implements Listener {
   public void onInventoryClick(InventoryClickEvent event) {
     if (!(event.getWhoClicked() instanceof Player player)) return;
 
+    // Vérifie si l'inventaire est celui du Cooker
     if (!INVENTORY_TITLE.equals(event.getView().getTitle())) return;
 
-    event.setCancelled(true);
-
+    // Si le joueur clique sur le bouton de confirmation, annuler l'événement
     if (event.getSlot() == 26) {
-      cookingManager.cookItems(player, event.getClickedInventory());
+      event.setCancelled(true); // Bloque l'interaction avec le bouton
+      Inventory inventory = event.getClickedInventory();
+      if (inventory != null) {
+        cookingManager.cookItems(player, inventory);
+      }
       player.closeInventory();
+      return;
     }
 
-    if (event.getCursor() != null) {
-      ItemStack item = event.getCursor();
-      if (!cookingManager.isCookable(item.getType())) {
-        event.setCancelled(true);
-        player.sendMessage("§cCet item ne peut pas être cuit !");
-      }
+    // Permet de déplacer des items à l'intérieur de l'inventaire sauf le bouton de confirmation
+    if (event.getClickedInventory() == event.getView().getTopInventory() && event.getSlot() != 26) {
+      return; // Autorise les clics pour déplacer des items
     }
+
+    // Bloque par défaut les interactions non autorisées
+    event.setCancelled(true);
   }
 
   @EventHandler

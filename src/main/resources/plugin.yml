@@ -5,6 +5,7 @@ api-version: 1.21
 description: Conçu et codé par Loyfael. Plugin pour un /furnace.
 commands:
   furnace:
+    usage: /furnace
     description: Open the cooker inventory.
     permission: itemcooker.use
     permission-message: Vous n'avez pas la permission d'utiliser cette commande.

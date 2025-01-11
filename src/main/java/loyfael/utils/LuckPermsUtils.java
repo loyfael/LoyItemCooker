@@ -27,8 +27,7 @@ public class LuckPermsUtils {
 
     return user.data().toCollection().stream()
             .filter(node -> node.getKey().equalsIgnoreCase(permission) && Objects.requireNonNull(node.getExpiry()).isAfter(Instant.now()))
-            .mapToLong(node -> node.getExpiry().getEpochSecond() - System.currentTimeMillis() / 1000)
-            .findFirst().orElse(0);
+            .mapToLong(node -> node.getExpiry().getEpochSecond() - System.currentTimeMillis() / 1000).findFirst().orElse(0);
   }
 
   public static void setCooldown(Player player, String permission, long minutes) {

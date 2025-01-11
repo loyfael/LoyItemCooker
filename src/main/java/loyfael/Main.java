@@ -15,17 +15,14 @@ public class Main extends JavaPlugin implements Listener {
   @Override
   public void onEnable() {
     try {
-      // Vérification de LuckPerms
       if (Bukkit.getPluginManager().getPlugin("LuckPerms") == null) {
-        getLogger().severe("LuckPerms n'est pas installé. Le plugin ne fonctionnera pas correctement.");
+        getLogger().severe("LuckPerms not detected and needed for works. Disabling plugin...");
         Bukkit.getPluginManager().disablePlugin(this);
         return;
       }
 
-      // Initialisation
       cookingManager = new CookingManager();
 
-      // Enregistrement des commandes et événements
       Objects.requireNonNull(getCommand("furnace")).setExecutor(new FurnaceCommand(cookingManager));
       Bukkit.getPluginManager().registerEvents(new InventoryListener(cookingManager), this);
 
