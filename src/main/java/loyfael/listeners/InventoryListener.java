@@ -1,17 +1,17 @@
 package loyfael.listeners;
 
 import loyfael.utils.CookingManager;
+import loyfael.utils.LuckPermsUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class InventoryListener implements Listener {
   private static final String INVENTORY_TITLE = "Cooker";
-
   private final CookingManager cookingManager;
 
   public InventoryListener(CookingManager cookingManager) {
@@ -25,30 +25,30 @@ public class InventoryListener implements Listener {
     // Vérifie si l'inventaire est celui du Cooker
     if (!INVENTORY_TITLE.equals(event.getView().getTitle())) return;
 
-    // Si le joueur clique sur le bouton de confirmation, annuler l'événement
+    // Vérifie si le joueur clique sur le bouton de confirmation
     if (event.getSlot() == 26) {
-      event.setCancelled(true); // Bloque l'interaction avec le bouton
+      event.setCancelled(true); // Empêche l'interaction par défaut avec le bouton
       Inventory inventory = event.getClickedInventory();
       if (inventory != null) {
-        cookingManager.cookItems(player, inventory);
+        boolean itemsCooked = cookingManager.cookItems(player, inventory);
+        if (itemsCooked) {
+          LuckPermsUtils.setCooldown(player, "itemcooker.use", 15); // Applique la permission en false
+        }
       }
       player.closeInventory();
       return;
     }
 
-    // Permet de déplacer des items à l'intérieur de l'inventaire sauf le bouton de confirmation
-    if (event.getClickedInventory() == event.getView().getTopInventory() && event.getSlot() != 26) {
-      return; // Autorise les clics pour déplacer des items
-    }
-
-    // Bloque par défaut les interactions non autorisées
-    event.setCancelled(true);
-  }
-
-  @EventHandler
-  public void onInventoryClose(InventoryCloseEvent event) {
-    if (INVENTORY_TITLE.equals(event.getView().getTitle())) {
-      ((Player) event.getPlayer()).sendMessage("§aMerci d'avoir utilisé le Cooker !");
+    // Permet de déplacer ou retirer des items autorisés
+    if (event.getClickedInventory() == event.getView().getTopInventory()) {
+      ItemStack clickedItem = event.getCurrentItem();
+      if (clickedItem != null) {
+        Material type = clickedItem.getType();
+        if (!cookingManager.getCookingMap().containsKey(type)) {
+          event.setCancelled(true); // Bloque uniquement les items non cuisables
+          player.sendMessage("§cCet objet ne peut pas être cuit.");
+        }
+      }
     }
   }
 }

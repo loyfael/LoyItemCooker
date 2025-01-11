@@ -9,9 +9,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class FurnaceCommand implements CommandExecutor {
-  private static final long COOLDOWN_TIME = 15; // Cooldown en minutes
-  private static final String PERMISSION = "itemcooker.use";
-
   private final CookingManager cookingManager;
 
   public FurnaceCommand(CookingManager cookingManager) {
@@ -19,14 +16,14 @@ public class FurnaceCommand implements CommandExecutor {
   }
 
   @Override
-  public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+  public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage("Cette commande est réservée aux joueurs.");
       return true;
     }
 
-    if (LuckPermsUtils.isInCooldown(player, PERMISSION)) {
-      long remainingTime = LuckPermsUtils.getRemainingCooldown(player, PERMISSION);
+    if (LuckPermsUtils.isInCooldown(player, "itemcooker.use")) {
+      long remainingTime = LuckPermsUtils.getRemainingCooldown(player, "itemcooker.use");
       long minutes = remainingTime / 60;
       long seconds = remainingTime % 60;
 
@@ -34,10 +31,6 @@ public class FurnaceCommand implements CommandExecutor {
       return true;
     }
 
-    // Ajouter un cooldown
-    LuckPermsUtils.setCooldown(player, PERMISSION, COOLDOWN_TIME);
-
-    // Ouvre l'inventaire
     cookingManager.openCookerInventory(player);
     player.sendMessage("§aFour virtuel ouvert !");
     return true;
