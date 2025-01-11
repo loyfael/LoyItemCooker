@@ -1,8 +1,8 @@
 package loyfael;
 
 import loyfael.commands.FurnaceCommand;
-import loyfael.cooking.CookingManager;
 import loyfael.listeners.InventoryListener;
+import loyfael.utils.CookingManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,8 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Objects;
 
 public class Main extends JavaPlugin implements Listener {
-
-  private static CookingManager cookingManager;
+  public CookingManager cookingManager;
 
   @Override
   public void onEnable() {
@@ -23,23 +22,21 @@ public class Main extends JavaPlugin implements Listener {
         return;
       }
 
-      // Initialisation du gestionnaire de cuisson
-      CookingManager cookingManager = new CookingManager();
+      // Initialisation
+      cookingManager = new CookingManager();
 
-      // Enregistrement des commandes et des événements
+      // Enregistrement des commandes et événements
       Objects.requireNonNull(getCommand("furnace")).setExecutor(new FurnaceCommand(cookingManager));
       Bukkit.getPluginManager().registerEvents(new InventoryListener(cookingManager), this);
 
-      getLogger().info("[ItemCooker] Plugin enabled successfully!");
+      getLogger().info("[CookerPlugin] Plugin enabled successfully!");
     } catch (Exception e) {
-      getLogger().severe("[ItemCooker] Failed to enable: " + e.getMessage());
+      getLogger().severe("[CookerPlugin] Failed to enable: " + e.getMessage());
     }
   }
 
   @Override
   public void onDisable() {
-    getLogger().info("[ItemCooker] Plugin disabled!");
+    getLogger().info("[CookerPlugin] Plugin disabled!");
   }
 }
-
-

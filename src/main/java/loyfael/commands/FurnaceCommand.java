@@ -1,67 +1,45 @@
 package loyfael.commands;
 
-import loyfael.cooking.CookingManager;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
-import net.luckperms.api.node.types.PermissionNode;
-import org.bukkit.Bukkit;
+import loyfael.utils.CookingManager;
+import loyfael.utils.LuckPermsUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
-
 public class FurnaceCommand implements CommandExecutor {
-  private static final String PERMISSION_FURNACE = "itemcooker.use";
   private static final long COOLDOWN_TIME = 15; // Cooldown en minutes
-  public final CookingManager cookingManager;
+  private static final String PERMISSION = "itemcooker.use";
+
+  private final CookingManager cookingManager;
 
   public FurnaceCommand(CookingManager cookingManager) {
     this.cookingManager = cookingManager;
   }
 
   @Override
-  public boolean onCommand(
-          @NotNull CommandSender sender,
-          @NotNull Command command,
-          @NotNull String label,
-          @NotNull String[] args
-  ) {
+  public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
     if (!(sender instanceof Player player)) {
       sender.sendMessage("Cette commande est réservée aux joueurs.");
       return true;
     }
 
-    LuckPerms luckPerms = LuckPermsProvider.get();
-    User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+    if (LuckPermsUtils.isInCooldown(player, PERMISSION)) {
+      long remainingTime = LuckPermsUtils.getRemainingCooldown(player, PERMISSION);
+      long minutes = remainingTime / 60;
+      long seconds = remainingTime % 60;
 
-    if (user == null) {
-      player.sendMessage("§cImpossible de récupérer vos informations LuckPerms.");
+      player.sendMessage(String.format("§cVous devez attendre encore %d minutes et %d secondes pour réutiliser cette commande.", minutes, seconds));
       return true;
     }
 
-    // Vérifie si le joueur est en cooldown
-    if (!user.getCachedData().getPermissionData().checkPermission(PERMISSION_FURNACE).asBoolean()) {
-      player.sendMessage("§cVous devez attendre avant d'utiliser cette commande.");
-      return true;
-    }
+    // Ajouter un cooldown
+    LuckPermsUtils.setCooldown(player, PERMISSION, COOLDOWN_TIME);
 
-    // Ajoute un cooldown de 45 minutes
-    Node cooldownNode = PermissionNode.builder(PERMISSION_FURNACE)
-            .value(false)
-            .expiry(COOLDOWN_TIME, TimeUnit.MINUTES)
-            .build();
-    user.data().add(cooldownNode);
-
-    luckPerms.getUserManager().saveUser(user);
-
-    // Ouvre l'inventaire du four virtuel
+    // Ouvre l'inventaire
+    cookingManager.openCookerInventory(player);
     player.sendMessage("§aFour virtuel ouvert !");
-    Bukkit.dispatchCommand(player, "furnace");
     return true;
   }
 }
