@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,31 +23,51 @@ public class InventoryListener implements Listener {
   public void onInventoryClick(InventoryClickEvent event) {
     if (!(event.getWhoClicked() instanceof Player player)) return;
 
-    // Vérifie si l'inventaire est celui du Cooker
+    // Verify if the inventory is the Cooker's
     if (!INVENTORY_TITLE.equals(event.getView().getTitle())) return;
 
-    // Vérifie si le joueur clique sur le bouton de confirmation
+    // Management of the confirmation button
     if (event.getSlot() == 26) {
-      event.setCancelled(true); // Empêche l'interaction par défaut avec le bouton
+      event.setCancelled(true);
       Inventory inventory = event.getClickedInventory();
       if (inventory != null) {
         boolean itemsCooked = cookingManager.cookItems(player, inventory);
         if (itemsCooked) {
-          LuckPermsUtils.setCooldown(player, "itemcooker.use", 15); // Applique la permission en false
+          LuckPermsUtils.setCooldown(player, "itemcooker.use", 15);
         }
       }
       player.closeInventory();
       return;
     }
 
-    // Permet de déplacer ou retirer des items autorisés
+    // Management of the addition of items
     if (event.getClickedInventory() == event.getView().getTopInventory()) {
-      ItemStack clickedItem = event.getCurrentItem();
-      if (clickedItem != null) {
-        Material type = clickedItem.getType();
+      ItemStack cursorItem = event.getCursor(); // Item which is being moved
+      if (cursorItem != null) {
+        Material type = cursorItem.getType();
         if (!cookingManager.getCookingMap().containsKey(type)) {
-          event.setCancelled(true); // Bloque uniquement les items non cuisables
-          player.sendMessage("§cCet objet ne peut pas être cuit.");
+          event.setCancelled(true); // block the addition of unauthorized items
+          player.sendMessage("§cCet item ne peut pas être ajouté à l'inventaire !");
+        }
+      }
+    }
+  }
+
+  @EventHandler
+  public void onInventoryDrag(InventoryDragEvent event) {
+    if (!(event.getWhoClicked() instanceof Player player)) return;
+
+    // Verify if the inventory is the Cooker's
+    if (!INVENTORY_TITLE.equals(event.getView().getTitle())) return;
+
+    // Block the addition of unauthorized items
+    for (int slot : event.getRawSlots()) {
+      if (slot < event.getView().getTopInventory().getSize()) { // Si le slot est dans l'inventaire Cooker
+        Material type = event.getOldCursor().getType();
+        if (!cookingManager.getCookingMap().containsKey(type)) {
+          event.setCancelled(true);
+          player.sendMessage("§cVous ne pouvez pas déplacer cet item ici !");
+          break;
         }
       }
     }

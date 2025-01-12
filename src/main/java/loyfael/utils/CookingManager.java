@@ -97,6 +97,12 @@ public class CookingManager {
     /*
      * BUILD BLOCKS
      */
+    cookingMap.put(Material.RAW_IRON, Material.IRON_INGOT);
+    cookingMap.put(Material.RAW_COPPER, Material.COPPER_INGOT);
+    cookingMap.put(Material.RAW_GOLD, Material.GOLD_INGOT);
+    cookingMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK);
+    cookingMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK);
+    cookingMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK);
     cookingMap.put(Material.COBBLESTONE, Material.STONE);
     cookingMap.put(Material.SAND, Material.GLASS);
     cookingMap.put(Material.RED_SAND, Material.GLASS);
