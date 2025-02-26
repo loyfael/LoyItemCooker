@@ -20,39 +20,38 @@ public class CookingManager {
 
   public void openCookerInventory(Player player) {
     Inventory inventory = Bukkit.createInventory(null, 27, INVENTORY_TITLE);
-
-    ItemStack confirmButton = new ItemStack(Material.GREEN_STAINED_GLASS_PANE);
-    ItemMeta meta = confirmButton.getItemMeta();
-    if (meta != null) {
-      meta.setDisplayName("§aConfirmer");
-      confirmButton.setItemMeta(meta);
-    }
-    inventory.setItem(26, confirmButton);
-
     player.openInventory(inventory);
   }
 
   public boolean cookItems(Player player, Inventory inventory) {
     boolean itemsCooked = false;
+    Map<ItemStack, Integer> unprocessedItems = new HashMap<>();
 
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < inventory.getSize(); i++) {
       ItemStack item = inventory.getItem(i);
-      if (item == null || !cookingMap.containsKey(item.getType())) continue;
+      if (item == null) continue;
 
-      Material cookedMaterial = cookingMap.get(item.getType());
-      player.getInventory().addItem(new ItemStack(cookedMaterial, item.getAmount()));
+      Material type = item.getType();
+      if (cookingMap.containsKey(type)) {
+        Material cookedMaterial = cookingMap.get(type);
+        player.getInventory().addItem(new ItemStack(cookedMaterial, item.getAmount()));
+        itemsCooked = true;
+      } else {
+        unprocessedItems.put(item.clone(), item.getAmount());
+      }
       inventory.setItem(i, null);
-      itemsCooked = true;
     }
 
-    if (itemsCooked) {
-      player.sendMessage("§aVos objets ont été cuits. Vous pourrez refaire la commande dans §2§l15 minutes§a.");
-      player.playSound(player.getLocation(), "minecraft:block.lava.extinguish", 1.0f, 1.0f);
-    } else {
-      player.sendMessage("§cAucun item n'a été cuit !");
+    if (!unprocessedItems.isEmpty()) {
+      for (var entry : unprocessedItems.entrySet()) {
+        ItemStack item = entry.getKey();
+        item.setAmount(entry.getValue());
+        player.getInventory().addItem(item);
+      }
+      player.sendMessage("§eCertains items n'ont pas pu être cuits et ont été retournés dans votre inventaire.");
     }
 
-    return itemsCooked;
+    return itemsCooked; // Retourne true si des items ont été cuits
   }
 
   public Map<Material, Material> getCookingMap() {
@@ -76,6 +75,12 @@ public class CookingManager {
     /*
      * ORES
      */
+    cookingMap.put(Material.RAW_IRON, Material.IRON_INGOT);
+    cookingMap.put(Material.RAW_COPPER, Material.COPPER_INGOT);
+    cookingMap.put(Material.RAW_GOLD, Material.GOLD_INGOT);
+    cookingMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK);
+    cookingMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK);
+    cookingMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK);
     cookingMap.put(Material.IRON_ORE, Material.IRON_INGOT);
     cookingMap.put(Material.DEEPSLATE_IRON_ORE, Material.IRON_INGOT);
     cookingMap.put(Material.COPPER_ORE, Material.COPPER_INGOT);
@@ -97,12 +102,6 @@ public class CookingManager {
     /*
      * BUILD BLOCKS
      */
-    cookingMap.put(Material.RAW_IRON, Material.IRON_INGOT);
-    cookingMap.put(Material.RAW_COPPER, Material.COPPER_INGOT);
-    cookingMap.put(Material.RAW_GOLD, Material.GOLD_INGOT);
-    cookingMap.put(Material.RAW_IRON_BLOCK, Material.IRON_BLOCK);
-    cookingMap.put(Material.RAW_COPPER_BLOCK, Material.COPPER_BLOCK);
-    cookingMap.put(Material.RAW_GOLD_BLOCK, Material.GOLD_BLOCK);
     cookingMap.put(Material.COBBLESTONE, Material.STONE);
     cookingMap.put(Material.SAND, Material.GLASS);
     cookingMap.put(Material.RED_SAND, Material.GLASS);
@@ -126,7 +125,9 @@ public class CookingManager {
     cookingMap.put(Material.BLACK_TERRACOTTA, Material.BLACK_GLAZED_TERRACOTTA);
     cookingMap.put(Material.SANDSTONE, Material.SMOOTH_SANDSTONE);
     cookingMap.put(Material.RED_SANDSTONE, Material.SMOOTH_RED_SANDSTONE);
-    cookingMap.put(Material.STONE_BRICKS, Material.CRACKED_STONE_BRICKS);
+    cookingMap.put(Material.STONE, Material.SMOOTH_STONE);
+    cookingMap.put(Material.QUARTZ_BLOCK, Material.SMOOTH_QUARTZ);
+    cookingMap.put(Material.BASALT, Material.POLISHED_BASALT);
 
     /*
      * COLORING
