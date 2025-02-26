@@ -26,9 +26,9 @@ public class Main extends JavaPlugin implements Listener {
       Objects.requireNonNull(getCommand("furnace")).setExecutor(new FurnaceCommand(cookingManager));
       Bukkit.getPluginManager().registerEvents(new InventoryListener(cookingManager), this);
 
-      getLogger().info("[CookerPlugin] Plugin enabled successfully!");
+      getLogger().info("[ItemCooker] By Loyfael.. Plugin enabled successfully!");
     } catch (Exception e) {
-      getLogger().severe("[CookerPlugin] Failed to enable: " + e.getMessage());
+      getLogger().severe("[ItemCooker] Failed to enable: " + e.getMessage());
     }
   }
 
