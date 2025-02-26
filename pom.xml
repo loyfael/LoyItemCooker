@@ -6,7 +6,7 @@
 
     <groupId>loyfael</groupId>
     <artifactId>ItemCooker</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>RELEASE-1.3</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
