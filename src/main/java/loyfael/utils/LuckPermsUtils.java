@@ -11,6 +11,19 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Utility class for LuckPerms
+ * @see LuckPerms
+ * @see LuckPermsProvider
+ * @see User
+ * @see Node
+ * @see PermissionNode
+ * @see Player
+ * @see Instant
+ * @see Objects
+ * @see TimeUnit
+ * @see System
+ */
 public class LuckPermsUtils {
   private static final LuckPerms luckPerms = LuckPermsProvider.get();
 
