@@ -1,5 +1,5 @@
 name: ItemCooker
-version: 1.0
+version: 1.3.0
 main: loyfael.Main
 api-version: 1.21
 description: Conçu et codé par Loyfael. Plugin pour un /furnace.
