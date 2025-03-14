@@ -1,5 +1,5 @@
 # ITEMCOOKER
-This plugin permit to cooks items. All items that can be baked in an oven / blast furnace / kiln are present.
+This Minecraft plugin permit to cooks items. All items that can be baked in an oven / blast furnace / kiln are present.
 
 ## HARD DEPENDENCIES
 - LuckPerms
